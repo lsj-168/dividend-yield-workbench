@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<!-- saved from url=(0106)file:///C:/Users/LSJ/Documents/Codex/2026-08-07/x-0-241-a-sh600795-1/outputs/dividend-yield-workbench.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=&#39;http://www.w3.org/2000/svg&#39; viewBox=&#39;0 0 64 64&#39;%3E%3Crect width=&#39;64&#39; height=&#39;64&#39; rx=&#39;15&#39; fill=&#39;%23080a0c&#39;/%3E%3Cpath d=&#39;M14 43l12-13 9 7 15-18&#39; fill=&#39;none&#39; stroke=&#39;%236ee7a5&#39; stroke-width=&#39;7&#39; stroke-linecap=&#39;round&#39; stroke-linejoin=&#39;round&#39;/%3E%3C/svg%3E">
+  <title>股息率工作台</title>
+  <style>
+    :root {
+      --bg: #080a0c;
+      --panel: #111417;
+      --panel-2: #171b1f;
+      --line: rgba(255, 255, 255, .09);
+      --line-strong: rgba(255, 255, 255, .15);
+      --text: #f3f6f4;
+      --muted: #8f9994;
+      --muted-2: #626b67;
+      --green: #6ee7a5;
+      --green-deep: #143d2a;
+      --red: #ff746c;
+      --red-deep: #421f21;
+      --amber: #f6c86c;
+      --cyan: #83e6d5;
+      --shadow: 0 20px 70px rgba(0, 0, 0, .28);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--bg); }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% -10%, rgba(79, 198, 156, .12), transparent 28rem),
+        radial-gradient(circle at 92% 4%, rgba(246, 200, 108, .07), transparent 24rem),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input { font: inherit; }
+
+    button { color: inherit; }
+
+    .shell {
+      width: min(1540px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 44px 0 64px;
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      padding: 0 2px 30px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 760;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 5px rgba(110, 231, 165, .1);
+      content: "";
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 60px);
+      font-weight: 820;
+      letter-spacing: -.055em;
+      line-height: 1;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin: 15px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 11px;
+      padding: 0 15px;
+      background: rgba(255, 255, 255, .035);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    }
+
+    .button:hover { border-color: rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .07); }
+    .button:active { transform: translateY(1px); }
+    .button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+    .button svg { width: 15px; height: 15px; }
+    .button.primary { border-color: rgba(110, 231, 165, .35); background: var(--green); color: #07110c; }
+    .button.primary:hover { border-color: var(--green); background: #8bedb6; }
+    .button.loading svg { animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      overflow: hidden;
+      margin-bottom: 22px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: rgba(17, 20, 23, .66);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .summary-item {
+      min-height: 84px;
+      padding: 17px 20px;
+      border-right: 1px solid var(--line);
+    }
+
+    .summary-item:last-child { border-right: 0; }
+
+    .summary-label {
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .summary-value { font-size: 22px; font-weight: 780; letter-spacing: -.035em; }
+    .summary-value.small { overflow: hidden; color: #cbd2ce; font-size: 13px; font-weight: 620; line-height: 1.65; text-overflow: ellipsis; white-space: nowrap; }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 4px rgba(246, 200, 108, .09);
+      vertical-align: 1px;
+    }
+
+    .status-dot.ok { background: var(--green); box-shadow: 0 0 0 4px rgba(110, 231, 165, .09); }
+    .status-dot.error { background: var(--red); box-shadow: 0 0 0 4px rgba(255, 116, 108, .09); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px 18px;
+      margin: 0 2px 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend-group { display: flex; flex-wrap: wrap; gap: 16px; }
+    .legend-key { display: inline-flex; align-items: center; gap: 7px; }
+    .swatch { width: 9px; height: 9px; border-radius: 3px; }
+    .swatch.good { background: var(--green); }
+    .swatch.wait { background: var(--red); }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(21, 25, 28, .98), rgba(14, 17, 19, .98));
+      box-shadow: 0 12px 34px rgba(0, 0, 0, .18);
+      transition: border-color .2s ease, transform .2s ease;
+    }
+
+    .card:hover { border-color: rgba(255, 255, 255, .16); transform: translateY(-2px); }
+    .card::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .15), transparent);
+      content: "";
+    }
+
+    .card-main { padding: 21px 21px 0; }
+
+    .card-head {
+      display: flex;
+      min-width: 0;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .identity { min-width: 0; }
+    .name { margin: 0; font-size: 18px; font-weight: 770; letter-spacing: -.02em; }
+    .code { margin-top: 5px; color: var(--muted-2); font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; letter-spacing: .075em; text-transform: uppercase; }
+
+    .quote { text-align: right; }
+    .live-price { font-size: 20px; font-weight: 780; letter-spacing: -.025em; }
+    .change { margin-top: 4px; font-size: 12px; font-weight: 720; }
+    .change.up { color: var(--red); }
+    .change.down { color: var(--green); }
+    .change.flat { color: var(--muted); }
+
+    .yield-block {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 25px 0 48px;
+    }
+
+    .yield-label { margin-bottom: 7px; color: var(--muted); font-size: 11px; font-weight: 690; letter-spacing: .075em; }
+    .yield-value { font-size: clamp(38px, 4vw, 51px); font-weight: 820; letter-spacing: -.065em; line-height: .95; }
+    .yield-value.elite { color: var(--cyan); }
+    .yield-value.high { color: var(--green); }
+    .yield-value.mid { color: var(--amber); }
+    .yield-value.low { color: var(--red); }
+    .yield-value.loading { color: var(--muted-2); }
+
+    .formula {
+      max-width: 138px;
+      padding-bottom: 2px;
+      color: var(--muted-2);
+      font-size: 10px;
+      line-height: 1.55;
+      text-align: right;
+    }
+
+    .track-wrap { position: relative; }
+
+    .marker {
+      position: absolute;
+      z-index: 3;
+      bottom: calc(100% + 9px);
+      left: var(--marker, 50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: translateX(-50%);
+      pointer-events: auto;
+      transition: left .35s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .marker.edge-left { transform: translateX(0); align-items: flex-start; }
+    .marker.edge-right { transform: translateX(-100%); align-items: flex-end; }
+
+    .marker-label {
+      max-width: 178px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .17);
+      border-radius: 7px;
+      padding: 5px 8px;
+      background: #e9eee9;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, .25);
+      color: #101411;
+      font-size: 10px;
+      font-weight: 780;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .marker-pin { width: 2px; height: 11px; background: #e9eee9; }
+
+    .target-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: 11px 11px 0 0;
+    }
+
+    .target {
+      min-width: 0;
+      padding: 10px 5px 11px;
+      border-right: 1px solid rgba(255, 255, 255, .11);
+      text-align: center;
+      transition: background .25s ease;
+    }
+
+    .target:last-child { border-right: 0; }
+    .target.met { background: linear-gradient(180deg, rgba(43, 153, 96, .34), rgba(19, 73, 45, .34)); }
+    .target.unmet { background: linear-gradient(180deg, rgba(166, 57, 58, .28), rgba(81, 28, 30, .3)); }
+    .target-rate { color: rgba(255, 255, 255, .66); font-size: 9px; font-weight: 720; }
+    .target-price { margin-top: 4px; overflow: hidden; color: #fff; font-size: 12px; font-weight: 760; text-overflow: ellipsis; white-space: nowrap; }
+
+    .edit-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 14px 21px 18px;
+      background: rgba(0, 0, 0, .15);
+    }
+
+    .field { min-width: 0; }
+    .field-label {
+      display: flex;
+      min-height: 20px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 5px;
+      color: var(--muted-2);
+      font-size: 9px;
+      font-weight: 720;
+      letter-spacing: .05em;
+    }
+
+    .field-label button {
+      border: 0;
+      padding: 0;
+      background: none;
+      color: var(--green);
+      cursor: pointer;
+      font-size: 9px;
+      font-weight: 720;
+    }
+
+    .field-label button:hover { text-decoration: underline; }
+
+    .input-wrap { position: relative; }
+    .input-prefix {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      color: var(--muted-2);
+      font-size: 11px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 9px 0 23px;
+      background: rgba(255, 255, 255, .035);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 680;
+      transition: border-color .18s ease, background .18s ease;
+    }
+
+    .input-wrap input:hover { border-color: var(--line-strong); }
+    .input-wrap input.manual { border-color: rgba(246, 200, 108, .34); background: rgba(246, 200, 108, .055); }
+    input::-webkit-inner-spin-button { opacity: .45; }
+
+    .footer {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 22px;
+      margin-top: 22px;
+      padding: 0 2px;
+      color: var(--muted-2);
+      font-size: 11px;
+      line-height: 1.65;
+    }
+
+    .footer p { max-width: 780px; margin: 0; }
+    .footer .reset {
+      flex: 0 0 auto;
+      border: 0;
+      padding: 0;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .footer .reset:hover { color: var(--text); text-decoration: underline; }
+
+    @media (max-width: 1120px) {
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 28px, 540px); padding-top: 28px; }
+      .masthead { grid-template-columns: 1fr; align-items: start; }
+      .actions { width: 100%; }
+      .button { flex: 1; }
+      .summary { grid-template-columns: 1fr 1fr; }
+      .summary-item:nth-child(2) { border-right: 0; }
+      .summary-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .cards { grid-template-columns: 1fr; }
+      .footer { flex-direction: column; }
+    }
+
+    @media (max-width: 410px) {
+      .shell { width: calc(100% - 20px); }
+      .masthead { padding-bottom: 22px; }
+      .actions { align-items: stretch; flex-direction: column-reverse; }
+      .summary-item { min-height: 76px; padding: 14px; }
+      .summary-value { font-size: 19px; }
+      .summary-value.small { font-size: 11px; }
+      .card-main { padding-right: 16px; padding-left: 16px; }
+      .edit-row { padding-right: 16px; padding-left: 16px; }
+      .target-price { font-size: 11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div>
+        <div class="eyebrow">Dividend Yield Console</div>
+        <h1>股息率工作台</h1>
+        <p class="subtitle">用股息率反推值得等待的价格。红色档位仍需回调，绿色档位已经达标；所有测算基于税前每股派息。</p>
+      </div>
+      <div class="actions">
+        <button class="button" id="clearManualButton" type="button" title="清除全部手动价格，恢复跟随实时行情">全部跟随行情</button>
+        <button class="button primary" id="refreshButton" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"></path><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"></path></svg>
+          <span>刷新行情</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="summary" aria-label="工作台摘要">
+      <div class="summary-item">
+        <div class="summary-label">覆盖标的</div>
+        <div class="summary-value" id="stockCount">12 只</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">股息率 ≥ 5%</div>
+        <div class="summary-value" id="qualifiedCount">10 只</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">平均股息率</div>
+        <div class="summary-value" id="averageYield">5.36%</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">行情状态</div>
+        <div class="summary-value small" id="quoteStatus"><span class="status-dot ok"></span>19:19:54 · 12/12 已更新</div>
+      </div>
+    </section>
+
+    <div class="legend">
+      <div class="legend-group">
+        <span class="legend-key"><i class="swatch good"></i>当前股息率已达到该档</span>
+        <span class="legend-key"><i class="swatch wait"></i>需要股价继续回落</span>
+      </div>
+      <span>目标价格 = 每股派息 ÷ 目标股息率</span>
+    </div>
+
+    <section class="cards" id="cards" aria-live="polite">
+          <article class="card" data-code="sh600795">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">国电电力</h2>
+                  <div class="code">sh600795</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥4.98</div>
+                  <div class="change down">-0.80%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value low">4.84%</div>
+                </div>
+                <div class="formula">每股派息 0.241<br>÷ 股价 4.98</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:58.03212851405628%" title="¥4.98 / 4.84%">
+                  <span class="marker-label">¥4.98 / 4.84%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥4.02">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥4.02</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥4.38">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥4.38</div>
+            </div>
+            <div class="target unmet" title="5% 股息率对应目标价 ¥4.82">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥4.82</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥5.36">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥5.36</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥6.02">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥6.02</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="0.241" aria-label="国电电力每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="4.98" placeholder="拉取中" aria-label="国电电力测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sz000933">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">神火股份</h2>
+                  <div class="code">sz000933</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥26.83</div>
+                  <div class="change up">+1.86%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value mid">5.22%</div>
+                </div>
+                <div class="formula">每股派息 1.4<br>÷ 股价 26.83</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:39.098024599329094%" title="¥26.83 / 5.22%">
+                  <span class="marker-label">¥26.83 / 5.22%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥23.33">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥23.33</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥25.45">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥25.45</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥28.00">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥28.00</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥31.11">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥31.11</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥35.00">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥35.00</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="1.4" aria-label="神火股份每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="26.83" placeholder="拉取中" aria-label="神火股份测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sh600011">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">华能国际</h2>
+                  <div class="code">sh600011</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥6.99</div>
+                  <div class="change down">-0.29%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value high">5.72%</div>
+                </div>
+                <div class="formula">每股派息 0.4<br>÷ 股价 6.99</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:13.876967095851223%" title="¥6.99 / 5.72%">
+                  <span class="marker-label">¥6.99 / 5.72%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥6.67">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥6.67</div>
+            </div>
+            <div class="target met" title="5.5% 股息率对应目标价 ¥7.27">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥7.27</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥8.00">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥8.00</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥8.89">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥8.89</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥10.00">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥10.00</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="0.4" aria-label="华能国际每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="6.99" placeholder="拉取中" aria-label="华能国际测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sh600036">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">招商银行</h2>
+                  <div class="code">sh600036</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥38.80</div>
+                  <div class="change down">-0.44%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value mid">5.20%</div>
+                </div>
+                <div class="formula">每股派息 2.016<br>÷ 股价 38.80</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:40.2061855670103%" title="¥38.80 / 5.20%">
+                  <span class="marker-label">¥38.80 / 5.20%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥33.60">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥33.60</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥36.65">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥36.65</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥40.32">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥40.32</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥44.80">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥44.80</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥50.40">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥50.40</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="2.016" aria-label="招商银行每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="38.8" placeholder="拉取中" aria-label="招商银行测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sh601318">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">中国平安</h2>
+                  <div class="code">sh601318</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥53.38</div>
+                  <div class="change down">-0.22%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value mid">5.06%</div>
+                </div>
+                <div class="formula">每股派息 2.7<br>÷ 股价 53.38</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:47.09629074559758%" title="¥53.38 / 5.06%">
+                  <span class="marker-label">¥53.38 / 5.06%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥45.00">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥45.00</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥49.09">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥49.09</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥54.00">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥54.00</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥60.00">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥60.00</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥67.50">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥67.50</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="2.7" aria-label="中国平安每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="53.38" placeholder="拉取中" aria-label="中国平安测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sh600690">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">海尔智家</h2>
+                  <div class="code">sh600690</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥21.93</div>
+                  <div class="change down">-0.86%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value mid">5.27%</div>
+                </div>
+                <div class="formula">每股派息 1.1559<br>÷ 股价 21.93</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:36.45690834473325%" title="¥21.93 / 5.27%">
+                  <span class="marker-label">¥21.93 / 5.27%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥19.27">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥19.27</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥21.02">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥21.02</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥23.12">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥23.12</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥25.69">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥25.69</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥28.90">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥28.90</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="1.1559" aria-label="海尔智家每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="21.93" placeholder="拉取中" aria-label="海尔智家测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sz000423">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">东阿阿胶</h2>
+                  <div class="code">sz000423</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥53.40</div>
+                  <div class="change down">-0.84%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value mid">5.07%</div>
+                </div>
+                <div class="formula">每股派息 2.7056<br>÷ 股价 53.40</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:46.66666666666668%" title="¥53.40 / 5.07%">
+                  <span class="marker-label">¥53.40 / 5.07%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥45.09">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥45.09</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥49.19">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥49.19</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥54.11">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥54.11</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥60.12">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥60.12</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥67.64">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥67.64</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="2.7056" aria-label="东阿阿胶每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="53.4" placeholder="拉取中" aria-label="东阿阿胶测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sz000538">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">云南白药</h2>
+                  <div class="code">sz000538</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥50.76</div>
+                  <div class="change up">+0.14%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value mid">5.13%</div>
+                </div>
+                <div class="formula">每股派息 2.602<br>÷ 股价 50.76</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:43.69582348305752%" title="¥50.76 / 5.13%">
+                  <span class="marker-label">¥50.76 / 5.13%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥43.37">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥43.37</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥47.31">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥47.31</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥52.04">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥52.04</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥57.82">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥57.82</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥65.05">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥65.05</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="2.602" aria-label="云南白药每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="50.76" placeholder="拉取中" aria-label="云南白药测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sh600887">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">伊利股份</h2>
+                  <div class="code">sh600887</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥26.21</div>
+                  <div class="change down">-0.42%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value mid">5.27%</div>
+                </div>
+                <div class="formula">每股派息 1.38<br>÷ 股价 26.21</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:36.741701640595224%" title="¥26.21 / 5.27%">
+                  <span class="marker-label">¥26.21 / 5.27%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥23.00">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥23.00</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥25.09">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥25.09</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥27.60">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥27.60</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥30.67">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥30.67</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥34.50">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥34.50</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="1.38" aria-label="伊利股份每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="26.21" placeholder="拉取中" aria-label="伊利股份测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sz000333">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">美的集团</h2>
+                  <div class="code">sz000333</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥83.50</div>
+                  <div class="change down">-2.13%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value mid">5.15%</div>
+                </div>
+                <div class="formula">每股派息 4.3<br>÷ 股价 83.50</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:42.51497005988023%" title="¥83.50 / 5.15%">
+                  <span class="marker-label">¥83.50 / 5.15%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥71.67">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥71.67</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥78.18">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥78.18</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥86.00">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥86.00</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥95.56">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥95.56</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥107.50">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥107.50</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="4.3" aria-label="美的集团每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="83.5" placeholder="拉取中" aria-label="美的集团测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sz000651">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">格力电器</h2>
+                  <div class="code">sz000651</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥40.10</div>
+                  <div class="change down">-0.37%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value elite">7.48%</div>
+                </div>
+                <div class="formula">每股派息 3<br>÷ 股价 40.10</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker edge-left" style="--marker:0%" title="¥40.10 / 7.48%">
+                  <span class="marker-label">¥40.10 / 7.48%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target met" title="6% 股息率对应目标价 ¥50.00">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥50.00</div>
+            </div>
+            <div class="target met" title="5.5% 股息率对应目标价 ¥54.55">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥54.55</div>
+            </div>
+            <div class="target met" title="5% 股息率对应目标价 ¥60.00">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥60.00</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥66.67">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥66.67</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥75.00">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥75.00</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="3" aria-label="格力电器每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="40.1" placeholder="拉取中" aria-label="格力电器测算股价"></span>
+              </label>
+            </div>
+          </article>
+          <article class="card" data-code="sh600941">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">中国移动</h2>
+                  <div class="code">sh600941</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">¥95.50</div>
+                  <div class="change down">-0.98%</div>
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value low">4.93%</div>
+                </div>
+                <div class="formula">每股派息 4.7037<br>÷ 股价 95.50</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker " style="--marker:53.73298429319369%" title="¥95.50 / 4.93%">
+                  <span class="marker-label">¥95.50 / 4.93%</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">
+            <div class="target unmet" title="6% 股息率对应目标价 ¥78.40">
+              <div class="target-rate">6%</div>
+              <div class="target-price">¥78.40</div>
+            </div>
+            <div class="target unmet" title="5.5% 股息率对应目标价 ¥85.52">
+              <div class="target-rate">5.5%</div>
+              <div class="target-price">¥85.52</div>
+            </div>
+            <div class="target unmet" title="5% 股息率对应目标价 ¥94.07">
+              <div class="target-rate">5%</div>
+              <div class="target-price">¥94.07</div>
+            </div>
+            <div class="target met" title="4.5% 股息率对应目标价 ¥104.53">
+              <div class="target-rate">4.5%</div>
+              <div class="target-price">¥104.53</div>
+            </div>
+            <div class="target met" title="4% 股息率对应目标价 ¥117.59">
+              <div class="target-rate">4%</div>
+              <div class="target-price">¥117.59</div>
+            </div></div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="4.7037" aria-label="中国移动每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 <span>实时</span></span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="95.5" placeholder="拉取中" aria-label="中国移动测算股价"></span>
+              </label>
+            </div>
+          </article></section>
+
+    <footer class="footer">
+      <p>数据通过腾讯财经公开行情接口自动刷新，默认每 60 秒更新一次。手动编辑价格后，该标的会停止自动覆盖；点击“恢复跟随”可重新接入行情。页面仅作估值测算，不构成投资建议。</p>
+      <button class="reset" id="resetButton" type="button">恢复初始派息与行情设置</button>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const INITIAL_STOCKS = [
+        { name: '国电电力', code: 'sh600795', dividend: 0.241 },
+        { name: '神火股份', code: 'sz000933', dividend: 1.4 },
+        { name: '华能国际', code: 'sh600011', dividend: 0.4 },
+        { name: '招商银行', code: 'sh600036', dividend: 2.016 },
+        { name: '中国平安', code: 'sh601318', dividend: 2.7 },
+        { name: '海尔智家', code: 'sh600690', dividend: 1.1559 },
+        { name: '东阿阿胶', code: 'sz000423', dividend: 2.7056 },
+        { name: '云南白药', code: 'sz000538', dividend: 2.602 },
+        { name: '伊利股份', code: 'sh600887', dividend: 1.38 },
+        { name: '美的集团', code: 'sz000333', dividend: 4.3 },
+        { name: '格力电器', code: 'sz000651', dividend: 3 },
+        { name: '中国移动', code: 'sh600941', dividend: 4.7037 }
+      ];
+
+      const TARGET_RATES = [6, 5.5, 5, 4.5, 4];
+      const STORAGE_KEY = 'dividend-yield-workbench-v1';
+      const AUTO_REFRESH_MS = 60 * 1000;
+      const state = new Map();
+      let isLoading = false;
+
+      const cardsEl = document.getElementById('cards');
+      const refreshButton = document.getElementById('refreshButton');
+      const clearManualButton = document.getElementById('clearManualButton');
+      const resetButton = document.getElementById('resetButton');
+      const quoteStatus = document.getElementById('quoteStatus');
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+      }
+
+      function readSavedState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+          return saved && typeof saved === 'object' ? saved : {};
+        } catch (_) {
+          return {};
+        }
+      }
+
+      function initialiseState() {
+        const saved = readSavedState();
+        INITIAL_STOCKS.forEach(stock => {
+          const prior = saved[stock.code] || {};
+          state.set(stock.code, {
+            ...stock,
+            dividend: Number.isFinite(Number(prior.dividend)) && Number(prior.dividend) >= 0 ? Number(prior.dividend) : stock.dividend,
+            price: prior.manualPrice && Number(prior.price) > 0 ? Number(prior.price) : null,
+            manualPrice: Boolean(prior.manualPrice && Number(prior.price) > 0),
+            changePct: null,
+            quotePrice: null
+          });
+        });
+      }
+
+      function saveState() {
+        const payload = {};
+        state.forEach(item => {
+          payload[item.code] = {
+            dividend: item.dividend,
+            price: item.price,
+            manualPrice: item.manualPrice
+          };
+        });
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (_) {}
+      }
+
+      function formatPrice(value) {
+        return Number.isFinite(value) && value > 0 ? `¥${value.toFixed(2)}` : '—';
+      }
+
+      function getYield(item) {
+        return Number.isFinite(item.price) && item.price > 0 && Number.isFinite(item.dividend)
+          ? item.dividend / item.price * 100
+          : null;
+      }
+
+      function yieldClass(value) {
+        if (!Number.isFinite(value)) return 'loading';
+        if (value >= 6) return 'elite';
+        if (value >= 5.5) return 'high';
+        if (value >= 5) return 'mid';
+        return 'low';
+      }
+
+      function markerPosition(value) {
+        if (!Number.isFinite(value)) return 50;
+        return Math.max(0, Math.min(100, (6 - value) / 2 * 100));
+      }
+
+      function changeMarkup(value, manual) {
+        if (manual) return '<div class="change flat">手动测算</div>';
+        if (!Number.isFinite(value)) return '<div class="change flat">等待行情</div>';
+        const cls = value > 0 ? 'up' : value < 0 ? 'down' : 'flat';
+        const sign = value > 0 ? '+' : '';
+        return `<div class="change ${cls}">${sign}${value.toFixed(2)}%</div>`;
+      }
+
+      function cardMarkup(item) {
+        const currentYield = getYield(item);
+        const position = markerPosition(currentYield);
+        const edgeClass = position <= 5 ? 'edge-left' : position >= 95 ? 'edge-right' : '';
+        const markerText = Number.isFinite(currentYield) ? `${formatPrice(item.price)} / ${currentYield.toFixed(2)}%` : '等待实时行情';
+        const targets = TARGET_RATES.map(rate => {
+          const targetPrice = item.dividend / (rate / 100);
+          const met = Number.isFinite(currentYield) && currentYield >= rate;
+          return `
+            <div class="target ${met ? 'met' : 'unmet'}" title="${rate}% 股息率对应目标价 ${formatPrice(targetPrice)}">
+              <div class="target-rate">${rate}%</div>
+              <div class="target-price">${formatPrice(targetPrice)}</div>
+            </div>`;
+        }).join('');
+
+        return `
+          <article class="card" data-code="${escapeHtml(item.code)}">
+            <div class="card-main">
+              <div class="card-head">
+                <div class="identity">
+                  <h2 class="name">${escapeHtml(item.name)}</h2>
+                  <div class="code">${escapeHtml(item.code)}</div>
+                </div>
+                <div class="quote">
+                  <div class="live-price">${formatPrice(item.price)}</div>
+                  ${changeMarkup(item.changePct, item.manualPrice)}
+                </div>
+              </div>
+              <div class="yield-block">
+                <div>
+                  <div class="yield-label">当前股息率</div>
+                  <div class="yield-value ${yieldClass(currentYield)}">${Number.isFinite(currentYield) ? `${currentYield.toFixed(2)}%` : '—'}</div>
+                </div>
+                <div class="formula">每股派息 ${item.dividend.toFixed(4).replace(/0+$/, '').replace(/\.$/, '')}<br>÷ 股价 ${Number.isFinite(item.price) ? item.price.toFixed(2) : '—'}</div>
+              </div>
+              <div class="track-wrap">
+                <div class="marker ${edgeClass}" style="--marker:${position}%" title="${escapeHtml(markerText)}">
+                  <span class="marker-label">${escapeHtml(markerText)}</span>
+                  <i class="marker-pin"></i>
+                </div>
+                <div class="target-grid">${targets}</div>
+              </div>
+            </div>
+            <div class="edit-row">
+              <label class="field">
+                <span class="field-label">每股派息</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input data-field="dividend" type="number" min="0" step="0.0001" inputmode="decimal" value="${item.dividend}" aria-label="${escapeHtml(item.name)}每股派息"></span>
+              </label>
+              <label class="field">
+                <span class="field-label">测算股价 ${item.manualPrice ? '<button data-action="follow" type="button">恢复跟随</button>' : '<span>实时</span>'}</span>
+                <span class="input-wrap"><span class="input-prefix">¥</span><input class="${item.manualPrice ? 'manual' : ''}" data-field="price" type="number" min="0.01" step="0.01" inputmode="decimal" value="${Number.isFinite(item.price) ? item.price : ''}" placeholder="拉取中" aria-label="${escapeHtml(item.name)}测算股价"></span>
+              </label>
+            </div>
+          </article>`;
+      }
+
+      function render() {
+        cardsEl.innerHTML = Array.from(state.values()).map(cardMarkup).join('');
+        updateSummary();
+      }
+
+      function updateSummary() {
+        const yields = Array.from(state.values()).map(getYield).filter(Number.isFinite);
+        document.getElementById('stockCount').textContent = `${state.size} 只`;
+        document.getElementById('qualifiedCount').textContent = yields.length ? `${yields.filter(value => value >= 5).length} 只` : '—';
+        document.getElementById('averageYield').textContent = yields.length ? `${(yields.reduce((a, b) => a + b, 0) / yields.length).toFixed(2)}%` : '—';
+      }
+
+      function setStatus(type, text) {
+        quoteStatus.innerHTML = `<span class="status-dot ${type}"></span>${escapeHtml(text)}`;
+      }
+
+      function formatTime(date) {
+        return new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(date);
+      }
+
+      function loadTencentQuotes() {
+        if (isLoading) return;
+        isLoading = true;
+        refreshButton.classList.add('loading');
+        refreshButton.disabled = true;
+        setStatus('', '正在拉取行情…');
+
+        const codes = Array.from(state.keys());
+        const script = document.createElement('script');
+        const timeout = window.setTimeout(() => finish(new Error('行情请求超时')), 10000);
+        let settled = false;
+
+        function finish(error) {
+          if (settled) return;
+          settled = true;
+          window.clearTimeout(timeout);
+          script.remove();
+          isLoading = false;
+          refreshButton.classList.remove('loading');
+          refreshButton.disabled = false;
+
+          if (error) {
+            setStatus('error', '连接失败，可手动填价');
+            return;
+          }
+
+          let successCount = 0;
+          codes.forEach(code => {
+            const raw = window[`v_${code}`];
+            if (typeof raw !== 'string' || !raw.includes('~')) return;
+            const fields = raw.split('~');
+            const price = Number(fields[3]);
+            const changePct = Number(fields[32]);
+            if (!(price > 0)) return;
+
+            const item = state.get(code);
+            item.quotePrice = price;
+            item.changePct = Number.isFinite(changePct) ? changePct : null;
+            if (!item.manualPrice) item.price = price;
+            successCount += 1;
+          });
+
+          saveState();
+          render();
+          if (successCount) setStatus('ok', `${formatTime(new Date())} · ${successCount}/${codes.length} 已更新`);
+          else setStatus('error', '未取得有效行情，可手动填价');
+        }
+
+        script.charset = 'gbk';
+        script.async = true;
+        script.src = `https://qt.gtimg.cn/q=${codes.join(',')}&_=${Date.now()}`;
+        script.onload = () => finish();
+        script.onerror = () => finish(new Error('行情接口连接失败'));
+        document.head.appendChild(script);
+      }
+
+      cardsEl.addEventListener('change', event => {
+        const input = event.target.closest('input[data-field]');
+        if (!input) return;
+        const card = input.closest('[data-code]');
+        const item = state.get(card.dataset.code);
+        const value = Number(input.value);
+
+        if (input.dataset.field === 'dividend') {
+          if (Number.isFinite(value) && value >= 0) item.dividend = value;
+        } else {
+          item.manualPrice = true;
+          if (Number.isFinite(value) && value > 0) item.price = value;
+        }
+        saveState();
+        render();
+      });
+
+      cardsEl.addEventListener('click', event => {
+        const button = event.target.closest('[data-action="follow"]');
+        if (!button) return;
+        const card = button.closest('[data-code]');
+        const item = state.get(card.dataset.code);
+        item.manualPrice = false;
+        item.price = item.quotePrice;
+        saveState();
+        render();
+        if (!Number.isFinite(item.quotePrice)) loadTencentQuotes();
+      });
+
+      refreshButton.addEventListener('click', loadTencentQuotes);
+
+      clearManualButton.addEventListener('click', () => {
+        let needsQuote = false;
+        state.forEach(item => {
+          item.manualPrice = false;
+          item.price = item.quotePrice;
+          if (!Number.isFinite(item.quotePrice)) needsQuote = true;
+        });
+        saveState();
+        render();
+        if (needsQuote) loadTencentQuotes();
+      });
+
+      resetButton.addEventListener('click', () => {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        state.clear();
+        initialiseState();
+        render();
+        loadTencentQuotes();
+      });
+
+      initialiseState();
+      render();
+      loadTencentQuotes();
+      window.setInterval(loadTencentQuotes, AUTO_REFRESH_MS);
+    })();
+  </script>
+
+
+</body></html>
